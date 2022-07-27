@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:superheroes/blocs/main_bloc.dart';
 import 'package:superheroes/resources/superheroes_colors.dart';
@@ -40,7 +41,7 @@ class _MainPageState extends State<MainPage> {
 class MainPageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MainBloc bloc = Provider.of<MainBloc>(context);
+    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return Stack(
       children: [
         MainPageStateWidget(),
@@ -51,7 +52,59 @@ class MainPageContent extends StatelessWidget {
             onTap: () => bloc.nextState(),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
+          child: SearchWidget(),
+        ),
       ],
+    );
+  }
+}
+
+class SearchWidget extends StatefulWidget {
+  @override
+  _SearchWidgetState createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> {
+
+  final TextEditingController controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
+      controller.addListener(() => bloc.updateText(controller.text));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
+    return TextField(
+      controller: controller,
+      style: TextStyle(
+        fontWeight: FontWeight.w400,
+        fontFamily: 'Open Sans',
+        fontSize: 20,
+        color: Colors.white,
+      ),
+      decoration: InputDecoration(
+          filled: true,
+          fillColor: SuperheroesColors.card75,
+          isDense: true,
+          prefixIcon: Icon(Icons.search, color: Colors.white54, size: 24),
+          suffix: GestureDetector(
+            onTap: () => controller.clear(),
+            child: Icon(Icons.clear, color: Colors.white),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.white24),
+          )),
     );
   }
 }
@@ -59,7 +112,7 @@ class MainPageContent extends StatelessWidget {
 class MainPageStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MainBloc bloc = Provider.of<MainBloc>(context);
+    final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return StreamBuilder<MainPageState>(
       stream: bloc.observeMainPageState(),
       builder: (context, snapshot) {
@@ -73,15 +126,15 @@ class MainPageStateWidget extends StatelessWidget {
           case MainPageState.loading:
             return LoadingIndicator();
           case MainPageState.noFavorites:
-            return NoFavorites();
+            return NoFavoritesWidget();
           case MainPageState.favorites:
-            return Favorites();
+            return YourFavoritesWidget();
           case MainPageState.searchResults:
-            return SearchResults();
+            return SearchResultsWidget();
           case MainPageState.nothingFound:
-            return NothingFound();
+            return NothingFoundWidget();
           case MainPageState.loadingError:
-            return LoadingError();
+            return LoadingErrorWidget();
           default:
             return Center(
               child: Text(
@@ -102,10 +155,10 @@ class MinSymbols extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
+    return const Align(
       alignment: Alignment.topCenter,
       child: Padding(
-        padding: const EdgeInsets.only(top: 110),
+        padding: EdgeInsets.only(top: 110),
         child: Text(
           'Enter at least 3 symbols',
           style: TextStyle(
@@ -127,10 +180,10 @@ class LoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
+    return const Align(
       alignment: Alignment.topCenter,
-      child: const Padding(
-        padding: const EdgeInsets.only(top: 110),
+      child: Padding(
+        padding: EdgeInsets.only(top: 110),
         child: CircularProgressIndicator(
           color: SuperheroesColors.blue,
           strokeWidth: 4,
@@ -140,32 +193,32 @@ class LoadingIndicator extends StatelessWidget {
   }
 }
 
-class NoFavorites extends StatelessWidget {
+class NoFavoritesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Align(
-        alignment: Alignment.center,
-        child: InfoWithButton(
-          title: 'No favorites yet',
-          subtitle: 'Search and add',
-          buttonText: 'Search',
-          assetImage: SuperheroesImages.ironMan,
-          imageHeight: 119,
-          imageWidth: 108,
-          imageTopPadding: 9,
-        ));
+    return Center(
+      child: InfoWithButton(
+        title: 'No favorites yet',
+        subtitle: 'Search and add',
+        buttonText: 'Search',
+        assetImage: SuperheroesImages.ironMan,
+        imageHeight: 119,
+        imageWidth: 108,
+        imageTopPadding: 9,
+      ),
+    );
   }
 }
 
-class Favorites extends StatelessWidget {
+class YourFavoritesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 90),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        const SizedBox(height: 90),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Your favorites',
             style: TextStyle(
@@ -203,15 +256,15 @@ class Favorites extends StatelessWidget {
   }
 }
 
-class SearchResults extends StatelessWidget {
+class SearchResultsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 90),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Search results',
             style: TextStyle(
@@ -249,36 +302,36 @@ class SearchResults extends StatelessWidget {
   }
 }
 
-class NothingFound extends StatelessWidget {
+class NothingFoundWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Align(
-        alignment: Alignment.center,
-        child: InfoWithButton(
-          title: 'Nothing found',
-          subtitle: 'Search for something else',
-          buttonText: 'Search',
-          assetImage: SuperheroesImages.hulk,
-          imageHeight: 119,
-          imageWidth: 108,
-          imageTopPadding: 9,
-        ));
+    return Center(
+      child: InfoWithButton(
+        title: 'Nothing found',
+        subtitle: 'Search for something else',
+        buttonText: 'Search',
+        assetImage: SuperheroesImages.hulk,
+        imageHeight: 112,
+        imageWidth: 84,
+        imageTopPadding: 16,
+      ),
+    );
   }
 }
 
-class LoadingError extends StatelessWidget {
+class LoadingErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Align(
-        alignment: Alignment.center,
-        child: InfoWithButton(
-          title: 'Error happened',
-          subtitle: 'Please, try again',
-          buttonText: 'Retry',
-          assetImage: SuperheroesImages.superMan,
-          imageHeight: 119,
-          imageWidth: 108,
-          imageTopPadding: 9,
-        ));
+    return Center(
+      child: InfoWithButton(
+        title: 'Error happened',
+        subtitle: 'Please, try again',
+        buttonText: 'Retry',
+        assetImage: SuperheroesImages.superMan,
+        imageHeight: 106,
+        imageWidth: 126,
+        imageTopPadding: 22,
+      ),
+    );
   }
 }

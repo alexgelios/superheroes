@@ -27,14 +27,16 @@ class InfoWithButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      //mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Stack(
+          alignment: Alignment.topCenter,
           children: [
             Container(
               width: 108,
               height: 108,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: SuperheroesColors.blue,
                 shape: BoxShape.circle,
               ),
@@ -52,7 +54,7 @@ class InfoWithButton extends StatelessWidget {
         SizedBox(height: 20),
         Text(
           '$title',
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w800,
               fontSize: 32,
@@ -61,13 +63,13 @@ class InfoWithButton extends StatelessWidget {
         SizedBox(height: 20),
         Text(
           '$subtitle'.toUpperCase(),
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w700,
               fontSize: 16,
               fontFamily: 'Open Sans'),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         ActionButton(
           text: '$buttonText',
           onTap: () {},

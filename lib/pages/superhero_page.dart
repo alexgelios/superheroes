@@ -20,7 +20,7 @@ class SuperheroPage extends StatelessWidget {
           children: [
             Center(
               child: Text(
-                '$name',
+                name,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,

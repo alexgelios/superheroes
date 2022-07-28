@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
+
 class MainBloc {
   static const minSymbols = 3;
 
@@ -66,8 +67,10 @@ class MainBloc {
 
   Future<List<SuperheroInfo>> search(final String text) async {
     await Future.delayed(Duration(seconds: 1));
-    return SuperheroInfo.mocked;
+    return List.from(SuperheroInfo.mocked.where((name) => name.toString().toUpperCase().contains(text.toUpperCase())));
   }
+
+
 
   Stream<MainPageState> observeMainPageState() => stateSubject;
 
@@ -92,6 +95,7 @@ class MainBloc {
     textSubscription?.cancel();
   }
 }
+
 
 enum MainPageState {
   noFavorites,

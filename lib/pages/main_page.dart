@@ -74,7 +74,10 @@ class _SearchWidgetState extends State<SearchWidget> {
   Widget build(BuildContext context) {
     final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
     return TextField(
+      textCapitalization: TextCapitalization.words,
       controller: controller,
+      cursorColor: Colors.white,
+      textInputAction: TextInputAction.search,
       style: TextStyle(
         fontWeight: FontWeight.w400,
         fontFamily: 'Open Sans',
@@ -82,21 +85,29 @@ class _SearchWidgetState extends State<SearchWidget> {
         color: Colors.white,
       ),
       decoration: InputDecoration(
-          filled: true,
-          fillColor: SuperheroesColors.card75,
-          isDense: true,
-          prefixIcon: Icon(Icons.search, color: Colors.white54, size: 24),
-          suffix: GestureDetector(
-            onTap: () => controller.clear(),
-            child: Icon(Icons.clear, color: Colors.white),
+        filled: true,
+        fillColor: SuperheroesColors.card75,
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.white,
+            width: 2,
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.white24),
-          )),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        isDense: true,
+        prefixIcon: Icon(Icons.search, color: Colors.white54, size: 24),
+        suffix: GestureDetector(
+          onTap: () => controller.clear(),
+          child: Icon(Icons.clear, color: Colors.white),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.white24),
+        ),
+      ),
     );
   }
 }

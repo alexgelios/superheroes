@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:superheroes/main.dart';
 
+import '../shared/internal/text_field_checks.dart';
 import '../shared/test_helpers.dart';
 
 ///

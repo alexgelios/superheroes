@@ -17,15 +17,28 @@ class MainBloc {
   MainBloc() {
     stateSubject.add(MainPageState.noFavorites);
 
-    textSubscription = currentTextSubject.listen(
+    textSubscription =
+        Rx.combineLatest2<String, List<SuperheroInfo>, MainPageStateInfo>(
+      currentTextSubject.distinct().debounceTime(
+            Duration(milliseconds: 500),
+          ),
+      favoriteSuperheroesSubject,
+      (searchedText, favorites) =>
+          MainPageStateInfo(searchedText, favorites.isNotEmpty),
+    ).listen(
       (value) {
+        //print('CHANGED $value');
         searchSubscription?.cancel();
-        if (value.isEmpty) {
-          stateSubject.add(MainPageState.favorites);
-        } else if (value.length < minSymbols) {
+        if (value.searchText.isEmpty) {
+          if (value.haveFavorites) {
+            stateSubject.add(MainPageState.favorites);
+          } else {
+            stateSubject.add(MainPageState.noFavorites);
+          }
+        } else if (value.searchText.length < minSymbols) {
           stateSubject.add(MainPageState.minSymbols);
         } else {
-          searchForSuperheroes(value);
+          searchForSuperheroes(value.searchText);
         }
       },
     );
@@ -33,23 +46,27 @@ class MainBloc {
 
   void searchForSuperheroes(final String text) {
     stateSubject.add(MainPageState.loading);
-    searchSubscription = search(text).asStream().listen(
-      (searchResults) {
-        if (searchResults.isEmpty) {
-          stateSubject.add(MainPageState.nothingFound);
-        } else {
-          searchedSuperheroesSubject.add(searchResults);
-          stateSubject.add(MainPageState.searchResults);
-        }
-      },
-      onError: (error, stackTrace) {
-        stateSubject.add(MainPageState.loadingError);
+    searchSubscription = search(text).asStream().listen((searchResults) {
+      if (searchResults.isEmpty) {
+        stateSubject.add(MainPageState.nothingFound);
+      } else {
+        searchedSuperheroesSubject.add(searchResults);
+        stateSubject.add(MainPageState.searchResults);
       }
-    );
+    }, onError: (error, stackTrace) {
+      stateSubject.add(MainPageState.loadingError);
+    });
   }
 
+  Stream<List<SuperheroInfo>> observeFavoritSuperheroes() =>
+      favoriteSuperheroesSubject;
+
+  Stream<List<SuperheroInfo>> observeSearchedSuperheroes() =>
+      searchedSuperheroesSubject;
+
   Future<List<SuperheroInfo>> search(final String text) async {
-    return [];
+    await Future.delayed(Duration(seconds: 1));
+    return SuperheroInfo.mocked;
   }
 
   Stream<MainPageState> observeMainPageState() => stateSubject;
@@ -132,4 +149,27 @@ class SuperheroInfo {
       imageUrl: 'https://www.superherodb.com/pictures2/portraits/10/100/22.jpg',
     ),
   ];
+}
+
+class MainPageStateInfo {
+  final String searchText;
+  final bool haveFavorites;
+
+  const MainPageStateInfo(this.searchText, this.haveFavorites);
+
+  @override
+  String toString() {
+    return 'MainPageStateInfo{searchText: $searchText, haveFavorites: $haveFavorites}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MainPageStateInfo &&
+          runtimeType == other.runtimeType &&
+          searchText == other.searchText &&
+          haveFavorites == other.haveFavorites;
+
+  @override
+  int get hashCode => searchText.hashCode ^ haveFavorites.hashCode;
 }

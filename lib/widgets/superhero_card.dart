@@ -27,12 +27,16 @@ class SuperheroCard extends StatelessWidget {
         );
       },
       child: Container(
-        color: SuperheroesColors.card,
         height: 70,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration (
+          borderRadius: BorderRadius.circular(8),
+          color: SuperheroesColors.card,
+        ),
         child: Row(
           children: [
             Image.network(
-              '$imageUrl',
+              imageUrl,
               fit: BoxFit.cover,
               width: 70,
               height: 70,
@@ -44,7 +48,7 @@ class SuperheroCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$name'.toUpperCase(),
+                    name.toUpperCase(),
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -53,7 +57,7 @@ class SuperheroCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '$realName',
+                    realName,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w400,

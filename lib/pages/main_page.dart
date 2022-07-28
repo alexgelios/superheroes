@@ -247,9 +247,10 @@ class SuperheroesList extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SuperheroCard(
-                  name: item.name,
-                  realName: item.realName,
-                  imageUrl: item.imageUrl,
+                  superheroInfo: item,
+                  //name: item.name,
+                  //realName: item.realName,
+                  //imageUrl: item.imageUrl,
                   onTap: () {},
                 ),
               );

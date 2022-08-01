@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +61,8 @@ class SearchWidget extends StatefulWidget {
 }
 
 class _SearchWidgetState extends State<SearchWidget> {
-  final TextEditingController controller = TextEditingController();
+  final controller = TextEditingController();
+  bool newSearchedText = false;
 
   @override
   void initState() {
@@ -78,6 +81,12 @@ class _SearchWidgetState extends State<SearchWidget> {
       controller: controller,
       cursorColor: Colors.white,
       textInputAction: TextInputAction.search,
+      onChanged: (text) {
+        bool newText = controller.text.isEmpty;
+        setState(() {
+          newText != newSearchedText;
+        });
+      },
       style: TextStyle(
         fontWeight: FontWeight.w400,
         fontFamily: 'Open Sans',
@@ -97,7 +106,9 @@ class _SearchWidgetState extends State<SearchWidget> {
         isDense: true,
         prefixIcon: Icon(Icons.search, color: Colors.white54, size: 24),
         suffix: GestureDetector(
-          onTap: () => controller.clear(),
+          onTap: () {
+            controller.clear();
+          },
           child: Icon(Icons.clear, color: Colors.white),
         ),
         border: OutlineInputBorder(
@@ -105,7 +116,15 @@ class _SearchWidgetState extends State<SearchWidget> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.white24),
+          //borderSide: BorderSide(color: Colors.white24)
+          borderSide: newSearchedText
+              ? BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                )
+              : BorderSide(
+                  color: Colors.white24,
+                ),
         ),
       ),
     );

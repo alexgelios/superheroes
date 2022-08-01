@@ -90,7 +90,6 @@ class MainBloc {
     favoriteSuperheroesSubject.close();
     searchedSuperheroesSubject.close();
     currentTextSubject.close();
-
     textSubscription?.cancel();
   }
 }

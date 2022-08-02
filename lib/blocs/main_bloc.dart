@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-
 class MainBloc {
   static const minSymbols = 3;
 
@@ -67,11 +66,26 @@ class MainBloc {
 
   Future<List<SuperheroInfo>> search(final String text) async {
     await Future.delayed(Duration(seconds: 1));
-    return List.from(SuperheroInfo.mocked.where((SuperheroInfo) => SuperheroInfo.name.toUpperCase().contains(text.toUpperCase())));
+    return List.from(SuperheroInfo.mocked.where((SuperheroInfo) =>
+        SuperheroInfo.name.toUpperCase().contains(text.toUpperCase())));
   }
 
-
   Stream<MainPageState> observeMainPageState() => stateSubject;
+
+  void removeFavorite() {
+    final List<SuperheroInfo> currentFavorite =
+        favoriteSuperheroesSubject.value;
+    if (currentFavorite.isEmpty) {
+      favoriteSuperheroesSubject.add(SuperheroInfo.mocked);
+    } else {
+      favoriteSuperheroesSubject.add(
+        currentFavorite.sublist(
+          0,
+          currentFavorite.length - 1,
+        ),
+      );
+    }
+  }
 
   void nextState() {
     final currentState = stateSubject.value;
@@ -93,7 +107,6 @@ class MainBloc {
     textSubscription?.cancel();
   }
 }
-
 
 enum MainPageState {
   noFavorites,

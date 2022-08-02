@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:superheroes/blocs/main_bloc.dart';
 import 'package:superheroes/resources/superheroes_colors.dart';
 import 'package:superheroes/resources/superheroes_images.dart';
+import 'package:superheroes/widgets/action_button.dart';
 import 'package:superheroes/widgets/info_with_button.dart';
 import 'package:superheroes/widgets/superhero_card.dart';
 
@@ -62,14 +63,22 @@ class SearchWidget extends StatefulWidget {
 
 class _SearchWidgetState extends State<SearchWidget> {
   final controller = TextEditingController();
-  bool newSearchedText = false;
+  bool haveSearchedText = false;
 
   @override
   void initState() {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       final MainBloc bloc = Provider.of<MainBloc>(context, listen: false);
-      controller.addListener(() => bloc.updateText(controller.text));
+      controller.addListener(() {
+        bloc.updateText(controller.text);
+        final haveText = controller.text.isNotEmpty;
+        if (haveSearchedText != haveText) {
+          setState(() {
+            haveSearchedText = haveText;
+          });
+        }
+      });
     });
   }
 
@@ -81,12 +90,6 @@ class _SearchWidgetState extends State<SearchWidget> {
       controller: controller,
       cursorColor: Colors.white,
       textInputAction: TextInputAction.search,
-      onChanged: (text) {
-        bool newText = controller.text.isEmpty;
-        setState(() {
-          newText != newSearchedText;
-        });
-      },
       style: TextStyle(
         fontWeight: FontWeight.w400,
         fontFamily: 'Open Sans',
@@ -116,8 +119,7 @@ class _SearchWidgetState extends State<SearchWidget> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          //borderSide: BorderSide(color: Colors.white24)
-          borderSide: newSearchedText
+          borderSide: haveSearchedText
               ? BorderSide(
                   color: Colors.white,
                   width: 2,
@@ -148,11 +150,27 @@ class MainPageStateWidget extends StatelessWidget {
           case MainPageState.loading:
             return LoadingIndicator();
           case MainPageState.noFavorites:
-            return NoFavoritesWidget();
+            return Stack(
+              children: [
+                NoFavoritesWidget(),
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ActionButton(
+                        text: 'Remove', onTap: bloc.removeFavorite)),
+              ],
+            );
           case MainPageState.favorites:
-            return SuperheroesList(
-              title: 'Your favorites',
-              stream: bloc.observeFavoritSuperheroes(),
+            return Stack(
+              children: [
+                SuperheroesList(
+                  title: 'Your favorites',
+                  stream: bloc.observeFavoritSuperheroes(),
+                ),
+                Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ActionButton(
+                        text: 'Remove', onTap: bloc.removeFavorite)),
+              ],
             );
           case MainPageState.searchResults:
             return SuperheroesList(

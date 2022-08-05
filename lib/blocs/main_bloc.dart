@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
+import 'package:http/http.dart' as http;
 
 class MainBloc {
   static const minSymbols = 3;
@@ -66,6 +67,11 @@ class MainBloc {
 
   Future<List<SuperheroInfo>> search(final String text) async {
     await Future.delayed(Duration(seconds: 1));
+    final response = await http.get(Uri.parse('https://postman-echo.com/get?test=123'));
+    print(response.statusCode);
+    print(response.reasonPhrase);
+    print(response.headers);
+    print(response.body);
     return List.from(SuperheroInfo.mocked.where((SuperheroInfo) =>
         SuperheroInfo.name.toUpperCase().contains(text.toUpperCase())));
   }

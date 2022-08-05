@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   await dotenv.load();
-  print(dotenv.env['SUPERHERO_TOKEN']);
    runApp(MyApp());
 }
 

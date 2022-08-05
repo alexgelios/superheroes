@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,7 +68,8 @@ class MainBloc {
 
   Future<List<SuperheroInfo>> search(final String text) async {
     await Future.delayed(Duration(seconds: 1));
-    final response = await http.get(Uri.parse('https://postman-echo.com/get?test=123'));
+    final token = dotenv.env['SUPERHERO_TOKEN'];
+    final response = await http.get(Uri.parse('https://www.superheroapi.com/api/$token/search/$text'));
     print(response.statusCode);
     print(response.reasonPhrase);
     print(response.headers);
